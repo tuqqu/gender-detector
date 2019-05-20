@@ -54,7 +54,7 @@ final class GenderDetector
             );
         }
 
-        $name = \strtolower($name);
+        $name = \str_replace([' ', '-'], '+', \strtolower($name));
 
         if (!isset(self::$names[$name])) {
             return $this->unknownGender;

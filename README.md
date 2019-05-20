@@ -14,7 +14,13 @@ composer require tuqqu/chickmate
 ### Usage
 
 Its usage is simple, for any given name it will give you one of the following genders (strings): 
-`male`, `mostly_male`, `unisex`, `mostly_female`, `female`. 
+```
+male
+mostly_male
+unisex
+mostly_female
+female
+```
 For an unknown name it will return `null`.
 All the gender values are available as constants of the `ChickMate\Gender` class for the convenience. 
 
@@ -25,6 +31,9 @@ $genderDetector = new ChickMate\GenderDetector();
 
 print $genderDetector->detect('Thomas');
 // male
+
+print $genderDetector->detect('Avery');
+// unisex
 ```
 
 I18N is fully supported
