@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChickMate\File;
+namespace GenderDetector\File;
 
-use ChickMate\Exception\FileReadingException;
+use GenderDetector\Exception\FileReadingException;
 
 /**
  * @internal backward compatibility is not promised

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ChickMate\File;
+namespace GenderDetector\File;
 
-use ChickMate\Country;
-use ChickMate\Gender;
+use GenderDetector\Country;
+use GenderDetector\Gender;
 
 /**
  * This class contains file format details and must not be used directly.

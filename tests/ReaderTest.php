@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ChickMate\Tests;
+namespace GenderDetector\Tests;
 
-use ChickMate\File\Reader;
+use GenderDetector\File\Reader;
 use PHPUnit\Framework\TestCase;
 
 final class ReaderTest extends TestCase
@@ -12,7 +12,7 @@ final class ReaderTest extends TestCase
     private const PATH = __DIR__ . '/fixtures/';
 
     /**
-     * @covers \ChickMate\File\Reader
+     * @covers \GenderDetector\File\Reader
      * @dataProvider provideValidData
      */
     public function testValidReading(array $data): void

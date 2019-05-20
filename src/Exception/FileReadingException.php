@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChickMate\Exception;
+namespace GenderDetector\Exception;
 
 final class FileReadingException extends \Exception
 {

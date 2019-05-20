@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace ChickMate\Tests;
+namespace GenderDetector\Tests;
 
-use ChickMate\{Country, Gender, GenderDetector};
+use GenderDetector\{Country, Gender, GenderDetector};
 use PHPUnit\Framework\TestCase;
 
 final class GenderDetectorTest extends TestCase
 {
     /**
-     * @covers \ChickMate\GenderDetector
+     * @covers \GenderDetector\GenderDetector
      * @dataProvider provideData
      */
     public function testDetecting(array $data): void

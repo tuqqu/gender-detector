@@ -73,4 +73,4 @@ vietnam,
 other_countries
 ```
 
-All the countries are available as constants of the `ChickMate\Country`. 
+All the countries are available as constants of the `GenderDetector\Country`. 

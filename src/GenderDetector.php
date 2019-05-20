@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ChickMate;
+namespace GenderDetector;
 
-use ChickMate\Exception\{GenderDetectingException, FileReadingException};
-use ChickMate\File\{Format, Reader};
+use GenderDetector\Exception\{GenderDetectingException, FileReadingException};
+use GenderDetector\File\{Format, Reader};
 
 final class GenderDetector
 {

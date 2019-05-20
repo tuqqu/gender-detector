@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ChickMate;
+namespace GenderDetector;
 
 final class Country
 {
