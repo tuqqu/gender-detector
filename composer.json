@@ -1,5 +1,5 @@
 {
-    "name": "tuqqu/chickmate",
+    "name": "tuqqu/gender-detector",
     "description": "A library to detect a person's gender by their first name.",
     "type": "library",
     "license": "GPL-3.0-only",
@@ -19,12 +19,12 @@
     },
     "autoload": {
         "psr-4": {
-            "ChickMate\\": "src/"
+            "GenderDetector\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ChickMate\\Tests\\": "tests/"
+            "GenderDetector\\Tests\\": "tests/"
         }
     },
     "scripts": {
