@@ -1,0 +1,40 @@
+{
+    "name": "tuqqu/chickmate",
+    "description": "A library to detect a person's gender by their first name.",
+    "type": "library",
+    "license": "GPL-3.0-only",
+    "authors": [
+        {
+            "name": "tuqqu"
+        }
+    ],
+    "require": {
+        "php": "^7.2"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "phpunit/phpunit": "^8.1",
+        "phpstan/phpstan": "^0.11.6",
+        "symfony/var-dumper": "^4.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "ChickMate\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ChickMate\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "php-cs-fixer": "vendor/bin/php-cs-fixer fix --dry-run --verbose --diff --using-cache=no",
+        "phpstan": "vendor/bin/phpstan analyse --configuration phpstan.neon --level=max --no-progress src tests",
+        "phpunit": "vendor/bin/phpunit",
+        "test": [
+            "@php-cs-fixer",
+            "@phpstan",
+            "@phpunit"
+        ]
+    }
+}
