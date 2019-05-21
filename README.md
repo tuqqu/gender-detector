@@ -102,6 +102,6 @@ Each file will be parsed only once, so you need not worry about instantiating ma
 
 ### Licenses
 
-The `GenderDetector` is licensed under the GNU General Public License v3.0.
+The `GenderDetector` is licensed under the MIT License.
 
 The data file `data/nam_dict.txt` is licensed under the GNU Free Documentation License.
