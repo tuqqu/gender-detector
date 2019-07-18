@@ -11,9 +11,9 @@ final class GenderDetector
 {
     private const DICT_PATH = __DIR__ . '/../data/nam_dict.txt';
 
-    private static $names = [];
+    private $names = [];
 
-    private static $consumedFiles = [];
+    private $consumedFiles = [];
 
     /** @var string|null */
     private $unknownGender;
@@ -56,14 +56,14 @@ final class GenderDetector
 
         $name = \str_replace([' ', '-'], '+', \strtolower($name));
 
-        if (!isset(self::$names[$name])) {
+        if (!isset($this->names[$name])) {
             return $this->unknownGender;
         }
 
         $best = null;
 
-        if (1 === \count(self::$names[$name])) {
-            $best = \key(self::$names[$name]);
+        if (1 === \count($this->names[$name])) {
+            $best = \key($this->names[$name]);
         }
 
         if (null !== $country && null === $best) {
@@ -82,12 +82,12 @@ final class GenderDetector
      */
     private function consumeFileContents(string $filepath): void
     {
-        if (!\in_array($filepath, self::$consumedFiles, true)) {
+        if (!\in_array($filepath, $this->consumedFiles, true)) {
             foreach ((new Reader($filepath))->readName() as [$name, $gender, $frequencies]) {
-                self::$names[$name][$gender] = $frequencies;
+                $this->names[$name][$gender] = $frequencies;
             }
 
-            self::$consumedFiles[] = $filepath;
+            $this->consumedFiles[] = $filepath;
         }
     }
 
@@ -96,7 +96,7 @@ final class GenderDetector
         $maxSum = $maxCount = 0;
         $best = null;
 
-        foreach (self::$names[$name] as $gender => $frequencies) {
+        foreach ($this->names[$name] as $gender => $frequencies) {
             $frequencies = \str_split(\str_replace(' ', '', $frequencies));
             $count = \count($frequencies);
             $sum = 0;
@@ -120,7 +120,7 @@ final class GenderDetector
         $maxFreq = 0;
         $best = null;
 
-        foreach (self::$names[$name] as $gender => $frequencies) {
+        foreach ($this->names[$name] as $gender => $frequencies) {
             $frequency = (int) $frequencies[Format::COUNTRY_OFFSET_MAP[$country]];
 
             if ($frequency > $maxFreq) {
