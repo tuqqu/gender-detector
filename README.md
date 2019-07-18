@@ -98,7 +98,7 @@ $genderDetector = new GenderDetector\GenderDetector('custom_file_path/dict.txt')
 $genderDetector->addDictionaryFile('custom_file_path/another_dict.txt');
 ```
 
-Each file will be parsed only once, so you need not worry about instantiating many `GenderDetector`'s.
+Note that each `GenderDetector` instantiation triggers file parsing, so you might want to avoid reading the same file twice.
 
 ### Licenses
 
