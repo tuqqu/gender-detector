@@ -16,8 +16,7 @@ final class Reader
     /** @var resource */
     private $handle;
 
-    /** @var string */
-    private $filename;
+    private string $filename;
 
     /**
      * @throws FileReadingException
@@ -51,9 +50,10 @@ final class Reader
     }
 
     /**
+     * @psalm-return iterable<int, array{lowercase-string, string, string}>
      * @throws FileReadingException
      */
-    public function readName(): \Generator
+    public function readName(): iterable
     {
         while (false !== ($line = \fgets($this->handle))) {
             if (\in_array($line[0], self::IGNORE, false)) {
@@ -72,8 +72,10 @@ final class Reader
 
     /**
      * @throws FileReadingException
+     * @psalm-suppress DocblockTypeContradiction
+     * @psalm-suppress InvalidPropertyAssignmentValue
      */
-    public function close(): void
+    private function close(): void
     {
         if (!\is_resource($this->handle)) {
             return;

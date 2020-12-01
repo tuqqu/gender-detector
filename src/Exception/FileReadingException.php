@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace GenderDetector\Exception;
 
-final class FileReadingException extends \Exception
+final class FileReadingException extends \RuntimeException
 {
 }

@@ -11,12 +11,10 @@ final class GenderDetector
 {
     private const DICT_PATH = __DIR__ . '/../data/nam_dict.txt';
 
-    private $names = [];
-
-    private $consumedFiles = [];
-
-    /** @var string|null */
-    private $unknownGender;
+    /** @var array<string, array<string, string>> */
+    private array $names = [];
+    private array $consumedFiles = [];
+    private ?string $unknownGender = null;
 
     /**
      * @throws FileReadingException
@@ -29,24 +27,20 @@ final class GenderDetector
     /**
      * @throws FileReadingException
      */
-    public function addDictionaryFile(string $path): self
+    public function addDictionaryFile(string $path): void
     {
         $this->consumeFileContents($path);
-
-        return $this;
     }
 
-    public function setUnknownGender(string $unknown): self
+    public function setUnknownGender(string $unknown): void
     {
         $this->unknownGender = $unknown;
-
-        return $this;
     }
 
     /**
      * @throws GenderDetectingException
      */
-    public function detect(string $name, ?string $country = null)
+    public function detect(string $name, ?string $country = null): ?string
     {
         if (null !== $country && !\in_array($country, Country::LIST, false)) {
             throw new GenderDetectingException(
