@@ -1,5 +1,6 @@
 M  Eddard                                 4511            2                           $
-F  Cercei                    1                                                        $
+F  Cercei                     1                                                       $
 M  Tyrion                                                                    1        $
 M  Varys                           2                                                  $
+F  Sansa                            3                                                 $
 M  Aegon                           2         D                                        $

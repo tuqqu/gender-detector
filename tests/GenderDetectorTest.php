@@ -10,54 +10,70 @@ use PHPUnit\Framework\TestCase;
 final class GenderDetectorTest extends TestCase
 {
     /**
-     * @covers \GenderDetector\GenderDetector
-     * @dataProvider provideData
+     * @dataProvider detectionData
      */
-    public function testDetecting(array $data): void
+    public function testDetect(string $name, ?string $country, string $expectedGender): void
     {
-        self::assertEquals(
-            (new GenderDetector())->detect($data['name'], $data['country']),
-            $data['gender']
-        );
+        $detector = new GenderDetector();
+
+        self::assertSame($detector->detect($name, $country), $expectedGender);
     }
 
-    public function provideData(): array
+    /**
+     * @dataProvider additionalDetectionData
+     */
+    public function testAddDictionaryFile(string $name, string $expectedGender): void
+    {
+        $detector = new GenderDetector(__DIR__ . '/fixtures/custom_dict.txt');
+
+        self::assertSame($detector->detect($name), $expectedGender);
+    }
+
+    public function detectionData(): array
     {
         return [
             [
-                [
-                    'name' => 'Robert',
-                    'country' => null,
-                    'gender' => Gender::MALE
-                ],
+                'Robert',
+                null,
+                Gender::MALE,
             ],
             [
-                [
-                    'name' => 'Angel',
-                    'country' => Country::USA,
-                    'gender' => Gender::UNISEX
-                ],
+                'Angel',
+                Country::USA,
+                Gender::UNISEX,
             ],
             [
-                [
-                    'name' => 'Jamie',
-                    'country' => null,
-                    'gender' => Gender::MOSTLY_FEMALE
-                ],
+                'Jamie',
+                null,
+                Gender::MOSTLY_FEMALE,
             ],
             [
-                [
-                    'name' => 'Jamie',
-                    'country' => Country::BELGIUM,
-                    'gender' => Gender::FEMALE
-                ],
+                'Jamie',
+                Country::BELGIUM,
+                Gender::FEMALE,
             ],
             [
-                [
-                    'name' => 'Jamie',
-                    'country' => Country::GREAT_BRITAIN,
-                    'gender' => Gender::MOSTLY_MALE
-                ],
+                'Jamie',
+                Country::GREAT_BRITAIN,
+                Gender::MOSTLY_MALE,
+            ],
+        ];
+    }
+
+    public function additionalDetectionData(): array
+    {
+        return [
+            [
+                'Varys',
+                Gender::MALE,
+            ],
+            [
+                'Tyrion',
+                Gender::MALE,
+            ],
+            [
+                'Cercei',
+                Gender::FEMALE,
             ],
         ];
     }

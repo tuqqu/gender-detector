@@ -15,7 +15,7 @@
         stopOnSkipped="false"
 >
     <testsuites>
-        <testsuite name="Functional tests">
+        <testsuite name="Unit tests">
             <directory>./tests</directory>
         </testsuite>
     </testsuites>
