@@ -1,0 +1,96 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+set_error_handler(static function (int $severity, string $message): void {
+    throw new ErrorException($message);
+});
+
+if ($argc <= 1) {
+    print_help();
+    exit(1);
+}
+
+foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php'] as $path) {
+    if (file_exists($path)) {
+        require $path;
+        break;
+    }
+}
+
+use GenderDetector\Exception\{FileReadingException, GenderDetectingException};
+use GenderDetector\GenderDetector;
+
+try {
+    $detector = new GenderDetector();
+} catch (FileReadingException $e) {
+    fwrite(STDERR, $e->getMessage() . "\n");
+    exit(1);
+}
+
+[$names, $country, $unknown] = parse_args($argv);
+
+const GENDER_UNKNOWN = 'unknown';
+$detector->setUnknownGender($unknown ?? GENDER_UNKNOWN);
+
+$detected = [];
+foreach ($names as $name) {
+    try {
+        $detected[] = $detector->detect($name, $country);
+    } catch (GenderDetectingException $e) {
+        fwrite(STDERR, 'Error: '. $e->getMessage() . "\n");
+        exit(1);
+    }
+}
+
+fwrite(STDOUT, implode(' ', $detected));
+
+function parse_args(array $args): array
+{
+    $names = [];
+    $country = null;
+    $unknown = null;
+    $parseOption = static function (string $option): string {
+        $value = null;
+        try {
+            [ , $value] = explode('=', $option);
+        } catch (Throwable $t) {
+            print_help();
+            exit(1);
+        }
+
+        return $value;
+    };
+
+    unset($args[0]);
+    foreach ($args as $arg) {
+        switch (true) {
+            case strpos($arg, '--country') === 0:
+                $country = $parseOption($arg);
+                break;
+
+            case strpos($arg, '--unknown') === 0:
+                $unknown = $parseOption($arg);
+                break;
+
+            default:
+                $names[] = $arg;
+        }
+    }
+
+    return [$names, $country, $unknown];
+}
+
+function print_help(): void
+{
+    fwrite(STDOUT, <<<HELP
+    Usage: 
+        gender-detector name1 [name2 ...] [--country=country_name] [--unknown=unisex]
+    
+    Example: 
+        gender-detector jane
+        gender-detector elon steven --country=usa
+        gender-detector martin --country=usa
+    HELP);
+}
