@@ -99,6 +99,7 @@ final class Country
         self::SLOVAKIA,
         self::HUNGARY,
         self::ROMANIA,
+        self::BULGARIA,
         self::BOSNIA_AND_HERZEGOVINA,
         self::CROATIA,
         self::KOSOVO,

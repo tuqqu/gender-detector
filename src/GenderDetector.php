@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GenderDetector;
 
-use GenderDetector\Exception\{GenderDetectingException, FileReadingException};
+use GenderDetector\Exception\{FileReadingException, GenderDetectingException};
 use GenderDetector\File\{Format, Reader};
 
 final class GenderDetector

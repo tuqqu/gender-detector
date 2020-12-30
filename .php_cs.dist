@@ -10,6 +10,8 @@ return PhpCsFixer\Config::create()
         'array_syntax' => ['syntax' => 'short'],
         'single_import_per_statement' => false,
         'trailing_comma_in_multiline_array' => false,
+        'single_line_throw' => false,
+        'phpdoc_separation' => false,
         'concat_space' => false,
     ])
     ->setRiskyAllowed(true)
