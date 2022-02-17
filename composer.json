@@ -37,9 +37,11 @@
         "php-cs-fixer": "vendor/bin/php-cs-fixer fix --dry-run --verbose --diff --using-cache=no",
         "psalm": "vendor/bin/psalm --no-cache",
         "phpunit": "vendor/bin/phpunit",
-        "tests": [
+        "lint": [
             "@php-cs-fixer",
-            "@psalm",
+            "@psalm"
+        ],
+        "test": [
             "@phpunit"
         ]
     }
