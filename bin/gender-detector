@@ -55,6 +55,9 @@ function parse_args(array $args): array
             case strpos($arg, '--unknown') === 0:
                 $unknown = parse_option($arg);
                 break;
+            case strpos($arg, '--help') === 0:
+                print_help();
+                exit(0);
             case strpos($arg, '--') === 0:
                 exit_with_error(sprintf('unrecognised option "%s"', $arg));
             default:
@@ -70,8 +73,7 @@ function parse_option(string $option): string
     try {
         [ , $value] = explode('=', $option);
     } catch (Throwable $t) {
-        print_help();
-        exit(1);
+        exit_with_error(sprintf('could not parse option "%s". See "--help"', $option));
     }
 
     return $value;
@@ -99,6 +101,10 @@ function main(array $argv): void
     }
 
     [$names, $country, $unknown] = parse_args($argv);
+
+    if (empty($names)) {
+        exit_with_error('expected at least 1 name');
+    }
 
     $detector->setUnknownGender($unknown ?? GENDER_UNKNOWN);
 
