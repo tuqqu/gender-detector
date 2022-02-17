@@ -9,9 +9,9 @@
     <projectFiles>
         <directory name="bin" />
         <directory name="src" />
-<!--        <directory name="tests" />-->
         <ignoreFiles>
             <directory name="vendor" />
+            <directory name="tests" />
         </ignoreFiles>
     </projectFiles>
 </psalm>

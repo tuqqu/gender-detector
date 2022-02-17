@@ -7,79 +7,74 @@ set_error_handler(static function (int $severity, string $message): void {
     throw new ErrorException($message);
 });
 
-if ($argc <= 1) {
-    print_help();
-    exit(1);
-}
-
-foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php'] as $path) {
-    if (file_exists($path)) {
-        require $path;
-        break;
-    }
-}
-
-use GenderDetector\Exception\{FileReadingException, GenderDetectingException};
+use GenderDetector\Exception\FileReadingException;
 use GenderDetector\GenderDetector;
 
-try {
-    $detector = new GenderDetector();
-} catch (FileReadingException $e) {
-    fwrite(STDERR, $e->getMessage() . "\n");
+const GENDER_UNKNOWN = 'unknown';
+
+require_autoload();
+main($argv);
+
+function require_autoload(): void
+{
+    foreach ([
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/../../../autoload.php'
+    ] as $path) {
+        if (file_exists($path)) {
+            require $path;
+            return;
+        }
+    }
+
+    exit_with_error('install dependencies using Composer.');
+}
+
+function exit_with_error(string $message): void
+{
+    fwrite(STDERR, 'Error: ' . $message . "\n");
     exit(1);
 }
-
-[$names, $country, $unknown] = parse_args($argv);
-
-const GENDER_UNKNOWN = 'unknown';
-$detector->setUnknownGender($unknown ?? GENDER_UNKNOWN);
-
-$detected = [];
-foreach ($names as $name) {
-    try {
-        $detected[] = $detector->detect($name, $country);
-    } catch (GenderDetectingException $e) {
-        fwrite(STDERR, 'Error: '. $e->getMessage() . "\n");
-        exit(1);
-    }
-}
-
-fwrite(STDOUT, implode(' ', $detected));
 
 function parse_args(array $args): array
 {
+    if (count($args) <= 1) {
+        exit_with_error('expected at least 1 argument');
+    }
+
     $names = [];
     $country = null;
     $unknown = null;
-    $parseOption = static function (string $option): string {
-        $value = null;
-        try {
-            [ , $value] = explode('=', $option);
-        } catch (Throwable $t) {
-            print_help();
-            exit(1);
-        }
-
-        return $value;
-    };
 
     unset($args[0]);
     foreach ($args as $arg) {
         switch (true) {
             case strpos($arg, '--country') === 0:
-                $country = $parseOption($arg);
+                $country = parse_option($arg);
                 break;
-
             case strpos($arg, '--unknown') === 0:
-                $unknown = $parseOption($arg);
+                $unknown = parse_option($arg);
                 break;
-
+            case strpos($arg, '--') === 0:
+                exit_with_error(sprintf('unrecognised option "%s"', $arg));
             default:
                 $names[] = $arg;
         }
     }
 
     return [$names, $country, $unknown];
+}
+
+function parse_option(string $option): string
+{
+    try {
+        [ , $value] = explode('=', $option);
+    } catch (Throwable $t) {
+        print_help();
+        exit(1);
+    }
+
+    return $value;
 }
 
 function print_help(): void
@@ -92,5 +87,29 @@ function print_help(): void
         gender-detector jane
         gender-detector elon steven --country=usa
         gender-detector martin --country=usa
-    HELP);
+    HELP . "\n");
+}
+
+function main(array $argv): void
+{
+    try {
+        $detector = new GenderDetector();
+    } catch (FileReadingException $e) {
+        exit_with_error($e->getMessage());
+    }
+
+    [$names, $country, $unknown] = parse_args($argv);
+
+    $detector->setUnknownGender($unknown ?? GENDER_UNKNOWN);
+
+    $detected = [];
+    foreach ($names as $name) {
+        try {
+            $detected[] = $detector->detect($name, $country);
+        } catch (Throwable $t) {
+            exit_with_error($t->getMessage());
+        }
+    }
+
+    fwrite(STDOUT, implode(' ', $detected) . "\n");
 }

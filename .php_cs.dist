@@ -13,6 +13,7 @@ return PhpCsFixer\Config::create()
         'single_line_throw' => false,
         'phpdoc_separation' => false,
         'concat_space' => false,
+        'yoda_style' => false,
     ])
     ->setRiskyAllowed(true)
     ->setFinder(
