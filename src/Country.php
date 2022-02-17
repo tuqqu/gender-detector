@@ -133,6 +133,6 @@ final class Country
         self::JAPAN,
         self::KOREA,
         self::VIETNAM,
-        self::OTHER_COUNTRIES
+        self::OTHER_COUNTRIES,
     ];
 }

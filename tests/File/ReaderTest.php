@@ -31,7 +31,7 @@ final class ReaderTest extends TestCase
             [
                 'eddard',
                 'M',
-                '            4511            2                           '
+                '            4511            2                           ',
             ],
         ];
     }

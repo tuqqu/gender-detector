@@ -62,7 +62,7 @@ final class Reader
             yield [
                 \mb_strtolower(\trim(\mb_substr($line, 2, 28))),
                 \rtrim(\mb_substr($line, 0, 2)),
-                \mb_substr($line, 30, 56)
+                \mb_substr($line, 30, 56),
             ];
         }
 

@@ -76,7 +76,7 @@ final class Format
         Country::JAPAN => 50,
         Country::KOREA => 51,
         Country::VIETNAM => 52,
-        Country::OTHER_COUNTRIES => 53
+        Country::OTHER_COUNTRIES => 53,
     ];
 
     public const GENDER_DEFINITIONS = [
