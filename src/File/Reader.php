@@ -15,7 +15,6 @@ final class Reader
 
     /** @var resource */
     private $handle;
-
     private string $filename;
 
     /**
@@ -32,7 +31,7 @@ final class Reader
         $this->filename = $filename;
         $handle = \fopen($this->filename, 'rb');
 
-        if (!$handle) {
+        if ($handle === false) {
             throw new FileReadingException(
                 \sprintf('File "%s" cannot be opened', $this->filename)
             );
@@ -56,14 +55,14 @@ final class Reader
     public function readName(): iterable
     {
         while (false !== ($line = \fgets($this->handle))) {
-            if (\in_array($line[0], self::IGNORE, false)) {
+            if (\in_array($line[0], self::IGNORE, true)) {
                 continue;
             }
 
             yield [
-                \strtolower(\trim(\substr($line, 2, 28))),
-                \rtrim(\substr($line, 0, 2)),
-                \substr($line, 30, 56)
+                \mb_strtolower(\trim(\mb_substr($line, 2, 28))),
+                \rtrim(\mb_substr($line, 0, 2)),
+                \mb_substr($line, 30, 56)
             ];
         }
 

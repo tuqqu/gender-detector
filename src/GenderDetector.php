@@ -42,13 +42,8 @@ final class GenderDetector
      */
     public function detect(string $name, ?string $country = null): ?string
     {
-        if (null !== $country && !\in_array($country, Country::LIST, false)) {
-            throw new GenderDetectingException(
-                \sprintf('Country or region with the name "%s" cannot be recognised', $country)
-            );
-        }
-
-        $name = \str_replace([' ', '-'], '+', \strtolower($name));
+        $country = self::sanitizeCountry($country);
+        $name = self::sanitizeName($name);
 
         if (!isset($this->names[$name])) {
             return $this->unknownGender;
@@ -124,5 +119,30 @@ final class GenderDetector
         }
 
         return $best;
+    }
+
+    /**
+     * @throws GenderDetectingException
+     */
+    private static function sanitizeCountry(?string $country): ?string
+    {
+        if ($country === null) {
+            return null;
+        }
+
+        $country = \mb_strtolower($country);
+
+        if (!\in_array($country, Country::LIST, true)) {
+            throw new GenderDetectingException(
+                \sprintf('Country or region with the name "%s" cannot be recognised', $country)
+            );
+        }
+
+        return $country;
+    }
+
+    private static function sanitizeName(string $name): string
+    {
+        return \str_replace([' ', '-'], '+', \mb_strtolower($name));
     }
 }
