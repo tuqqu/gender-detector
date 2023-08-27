@@ -4,145 +4,109 @@ declare(strict_types=1);
 
 namespace GenderDetector;
 
-use GenderDetector\Exception\{FileReadingException, GenderDetectingException};
-use GenderDetector\File\{Format, Reader};
+use GenderDetector\File\NameRecord;
+use GenderDetector\File\Reader;
+
+use function count;
+use function hexdec;
+use function mb_strtolower;
+use function str_replace;
 
 final class GenderDetector
 {
     private const DICT_PATH = __DIR__ . '/../data/nam_dict.txt';
 
-    /** @var array<string, array<string, string>> */
+    /** @var array<string, list<NameRecord>> */
     private array $names = [];
-    private array $consumedFiles = [];
-    private ?string $unknownGender = null;
 
-    /**
-     * @throws FileReadingException
-     */
-    public function __construct(string $filepath = self::DICT_PATH)
+    public function __construct(string $dictPath = self::DICT_PATH)
     {
-        $this->consumeFileContents($filepath);
+        $this->consumeDictFile($dictPath);
     }
 
-    /**
-     * @throws FileReadingException
-     */
-    public function addDictionaryFile(string $path): void
+    public function addDictionaryFile(string $dictPath): void
     {
-        $this->consumeFileContents($path);
+        $this->consumeDictFile($dictPath);
     }
 
-    public function setUnknownGender(string $unknown): void
+    public function getGender(string $name, ?Country $country = null): ?Gender
     {
-        $this->unknownGender = $unknown;
-    }
-
-    /**
-     * @throws GenderDetectingException
-     */
-    public function detect(string $name, ?string $country = null): ?string
-    {
-        $country = self::sanitizeCountry($country);
         $name = self::sanitizeName($name);
 
         if (!isset($this->names[$name])) {
-            return $this->unknownGender;
+            return null;
         }
 
         $best = null;
 
-        if (1 === \count($this->names[$name])) {
-            $best = \key($this->names[$name]);
+        if (count($this->names[$name]) === 1) {
+            $best = $this->names[$name][0]->gender;
         }
 
-        if (null !== $country && null === $best) {
+        if ($country !== null && $best === null) {
             $best = $this->computeBestForCountry($name, $country);
         }
 
-        if (null === $best) {
+        if ($best === null) {
             $best = $this->computeBestForAllCountries($name);
         }
 
-        return Format::GENDER_DEFINITIONS[$best] ?? $this->unknownGender;
+        return $best;
     }
 
-    /**
-     * @throws FileReadingException
-     */
-    private function consumeFileContents(string $filepath): void
+    private function consumeDictFile(string $dictPath): void
     {
-        if (!\in_array($filepath, $this->consumedFiles, true)) {
-            foreach ((new Reader($filepath))->readName() as [$name, $gender, $frequencies]) {
-                $this->names[$name][$gender] = $frequencies;
-            }
+        $reader = new Reader($dictPath);
 
-            $this->consumedFiles[] = $filepath;
+        foreach ($reader->readLine() as $nameRecord) {
+            $this->names[$nameRecord->name][] = $nameRecord;
         }
     }
 
-    private function computeBestForAllCountries(string $name): ?string
+    private function computeBestForAllCountries(string $name): ?Gender
     {
-        $maxSum = $maxCount = 0;
+        $maxSum = 0;
+        $maxCount = 0;
         $best = null;
 
-        foreach ($this->names[$name] as $gender => $frequencies) {
-            $frequencies = \str_split(\str_replace(' ', '', $frequencies));
-            $count = \count($frequencies);
+        foreach ($this->names[$name] as $nameRecord) {
+            $frequencies = $nameRecord->frequencies->getAll();
+            $count = count($frequencies);
             $sum = 0;
 
             foreach ($frequencies as $frequency) {
-                $sum += \hexdec($frequency);
+                $sum += hexdec($frequency);
             }
 
             if ($sum > $maxSum || ($sum === $maxSum && $count > $maxCount)) {
                 $maxSum = $sum;
                 $maxCount = $count;
-                $best = $gender;
+                $best = $nameRecord->gender;
             }
         }
 
         return $best;
     }
 
-    private function computeBestForCountry(string $name, string $country): ?string
+    private function computeBestForCountry(string $name, Country $country): ?Gender
     {
         $maxFreq = 0;
         $best = null;
 
-        foreach ($this->names[$name] as $gender => $frequencies) {
-            $frequency = (int) $frequencies[Format::COUNTRY_OFFSET_MAP[$country]];
+        foreach ($this->names[$name] as $nameRecord) {
+            $frequency = $nameRecord->frequencies->getForCountry($country);
 
             if ($frequency > $maxFreq) {
                 $maxFreq = $frequency;
-                $best = $gender;
+                $best = $nameRecord->gender;
             }
         }
 
         return $best;
     }
 
-    /**
-     * @throws GenderDetectingException
-     */
-    private static function sanitizeCountry(?string $country): ?string
-    {
-        if ($country === null) {
-            return null;
-        }
-
-        $country = \mb_strtolower($country);
-
-        if (!\in_array($country, Country::LIST, true)) {
-            throw new GenderDetectingException(
-                \sprintf('Country or region with the name "%s" cannot be recognised', $country)
-            );
-        }
-
-        return $country;
-    }
-
     private static function sanitizeName(string $name): string
     {
-        return \str_replace([' ', '-'], '+', \mb_strtolower($name));
+        return mb_strtolower(str_replace([' ', '-'], '+', $name));
     }
 }

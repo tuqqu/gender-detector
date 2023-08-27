@@ -4,84 +4,93 @@ declare(strict_types=1);
 
 namespace GenderDetector\File;
 
+use GenderDetector\File\FileUtils as utils;
 use GenderDetector\Exception\FileReadingException;
 
+use function fclose;
+use function fgets;
+use function file_exists;
+use function in_array;
+use function is_readable;
+use function is_resource;
+use function mb_strtolower;
+use function mb_substr;
+use function rtrim;
+use function sprintf;
+use function trim;
+use function fopen;
+
 /**
- * @internal backward compatibility is not promised
+ * Reads gender data from a file.
+ *
+ * @internal
  */
 final class Reader
 {
-    private const IGNORE = ['#', '='];
+    /** @var resource|closed-resource */
+    private mixed $handle;
+    private readonly string $filename;
 
-    /** @var resource */
-    private $handle;
-    private string $filename;
-
-    /**
-     * @throws FileReadingException
-     */
     public function __construct(string $filename)
     {
-        if (!\file_exists($filename) || !\is_readable($filename)) {
-            throw new FileReadingException(
-                \sprintf('File "%s" either does not exist or cannot be read', $filename)
-            );
+        $this->filename = $filename;
+
+        if (!file_exists($this->filename) || !is_readable($this->filename)) {
+            throw new FileReadingException(sprintf('File "%s" is not readable', $filename));
         }
 
-        $this->filename = $filename;
-        $handle = \fopen($this->filename, 'rb');
+        $handle = fopen($this->filename, 'rb');
 
         if ($handle === false) {
-            throw new FileReadingException(
-                \sprintf('File "%s" cannot be opened', $this->filename)
-            );
+            throw new FileReadingException(sprintf('File "%s" cannot be opened', $this->filename));
         }
 
         $this->handle = $handle;
     }
 
-    /**
-     * @throws FileReadingException
-     */
     public function __destruct()
     {
         $this->close();
     }
 
     /**
-     * @psalm-return iterable<int, array{lowercase-string, string, string}>
-     * @throws FileReadingException
+     * @return iterable<int, NameRecord>
      */
-    public function readName(): iterable
+    public function readLine(): iterable
     {
-        while (false !== ($line = \fgets($this->handle))) {
-            if (\in_array($line[0], self::IGNORE, true)) {
+        /** @psalm-suppress PossiblyInvalidArgument */
+        while (false !== ($line = fgets($this->handle))) {
+            if (self::skipLine($line)) {
                 continue;
             }
 
-            yield [
-                \mb_strtolower(\trim(\mb_substr($line, 2, 28))),
-                \rtrim(\mb_substr($line, 0, 2)),
-                \mb_substr($line, 30, 56),
-            ];
+            $name = mb_strtolower(trim(mb_substr($line, utils::NAME_OFFSET_START, utils::NAME_OFFSET_END)));
+            $gender = rtrim(mb_substr($line, utils::GENDER_OFFSET_START, utils::GENDER_OFFSET_END));
+            $frequencies = mb_substr($line, utils::FREQUENCY_OFFSET_START, utils::FREQUENCY_OFFSET_END);
+
+            yield new NameRecord(
+                name: $name,
+                gender: utils::getGenderByCode($gender) ?? throw new FileReadingException(sprintf('Unknown gender code "%s"', $gender)),
+                frequencies: new CountryFrequencyList($frequencies),
+            );
         }
 
         $this->close();
     }
 
-    /**
-     * @throws FileReadingException
-     * @psalm-suppress DocblockTypeContradiction
-     * @psalm-suppress InvalidPropertyAssignmentValue
-     */
     private function close(): void
     {
-        if (!\is_resource($this->handle)) {
+        if (!is_resource($this->handle)) {
             return;
         }
 
-        if (false === \fclose($this->handle)) {
-            throw new FileReadingException(\sprintf('Error when closing the file: "%s".', $this->filename));
+        if (fclose($this->handle) === false) {
+            throw new FileReadingException(sprintf('Error while closing file "%s"', $this->filename));
         }
+    }
+
+    private static function skipLine(string $line): bool
+    {
+        return in_array($line[0], utils::IGNORE_CHARS, true);
     }
 }

@@ -4,35 +4,40 @@ declare(strict_types=1);
 
 namespace GenderDetector\Tests\File;
 
+use GenderDetector\Exception\FileReadingException;
+use GenderDetector\File\NameRecord;
 use GenderDetector\File\Reader;
+use GenderDetector\Gender;
 use PHPUnit\Framework\TestCase;
 
 final class ReaderTest extends TestCase
 {
     private const FILE_PATH = __DIR__ . '/../fixtures/custom_dict.txt';
 
-    /**
-     * @dataProvider readNameData
-     */
-    public function testReadName(string $expectedName, string $expectedGender, string $expectedFrequencies): void
+    public function testReadName(): void
     {
         $reader = new Reader(self::FILE_PATH);
-        $nameData = $reader->readName();
-        [$name, $gender, $freqs] = $nameData->current();
+        $nameRecords = $reader->readLine();
 
-        self::assertSame($expectedName, $name);
-        self::assertEquals($expectedGender, $gender);
-        self::assertEquals($expectedFrequencies, $freqs);
+        $firstRecord = null;
+
+        foreach ($nameRecords as $nameRecord) {
+            self::assertInstanceOf(NameRecord::class, $nameRecord);
+            $firstRecord = $nameRecord;
+
+            break;
+        }
+
+        self::assertNotNull($firstRecord);
+        self::assertSame('eddard', $firstRecord->name);
+        self::assertEquals(Gender::Male, $firstRecord->gender);
+        self::assertEquals([4, 5, 1, 1, 2], $firstRecord->frequencies->getAll());
     }
 
-    public function readNameData(): array
+    public function testInvalidFilePath(): void
     {
-        return [
-            [
-                'eddard',
-                'M',
-                '            4511            2                           ',
-            ],
-        ];
+        $this->expectException(FileReadingException::class);
+
+        new Reader('invalid_path.txt');
     }
 }

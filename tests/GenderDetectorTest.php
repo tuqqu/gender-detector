@@ -4,76 +4,102 @@ declare(strict_types=1);
 
 namespace GenderDetector\Tests;
 
-use GenderDetector\{Country, Gender, GenderDetector};
+use GenderDetector\Gender;
+use GenderDetector\GenderDetector;
+use GenderDetector\Country;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class GenderDetectorTest extends TestCase
 {
-    /**
-     * @dataProvider detectionData
-     */
-    public function testDetect(string $name, ?string $country, string $expectedGender): void
+    #[DataProvider('provideNameData')]
+    public function testGetGender(string $name, ?Country $region, Gender $expectedGender): void
     {
         $detector = new GenderDetector();
+        $gender = $detector->getGender($name, $region);
 
-        self::assertSame($detector->detect($name, $country), $expectedGender);
+        self::assertSame($expectedGender, $gender);
     }
 
-    /**
-     * @dataProvider additionalDetectionData
-     */
-    public function testAddDictionaryFile(string $name, string $expectedGender): void
+    #[DataProvider('provideNameDataForCustomDict')]
+    public function testAddDictionaryFile(string $name, Gender $expectedGender): void
     {
         $detector = new GenderDetector(__DIR__ . '/fixtures/custom_dict.txt');
+        $gender = $detector->getGender($name);
 
-        self::assertSame($detector->detect($name), $expectedGender);
+        self::assertSame($expectedGender, $gender);
     }
 
-    public function detectionData(): array
+    public static function provideNameData(): array
     {
         return [
             [
                 'Robert',
                 null,
-                Gender::MALE,
+                Gender::Male,
             ],
             [
                 'Angel',
-                Country::USA,
-                Gender::UNISEX,
+                Country::Usa,
+                Gender::Unisex,
             ],
             [
                 'Jamie',
                 null,
-                Gender::MOSTLY_FEMALE,
+                Gender::MostlyFemale,
             ],
             [
                 'Jamie',
-                Country::BELGIUM,
-                Gender::FEMALE,
+                Country::Belgium,
+                Gender::Female,
             ],
             [
                 'Jamie',
-                Country::GREAT_BRITAIN,
-                Gender::MOSTLY_MALE,
+                Country::GreatBritain,
+                Gender::MostlyMale,
+            ],
+            [
+                'Robin',
+                null,
+                Gender::MostlyMale,
+            ],
+            [
+                'Robin',
+                Country::Usa,
+                Gender::MostlyFemale,
+            ],
+            [
+                'Robin',
+                Country::France,
+                Gender::Male,
+            ],
+            [
+                'Robin',
+                Country::Ireland,
+                Gender::Unisex,
+            ],
+            [
+                'Geirþrúður',
+                null,
+                Gender::Female,
             ],
         ];
     }
 
-    public function additionalDetectionData(): array
+    public static function provideNameDataForCustomDict(): array
     {
         return [
             [
                 'Varys',
-                Gender::MALE,
+                Gender::Male,
             ],
             [
                 'Tyrion',
-                Gender::MALE,
+                Gender::Male,
             ],
             [
                 'Cercei',
-                Gender::FEMALE,
+                Gender::Female,
             ],
         ];
     }

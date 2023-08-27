@@ -1,0 +1,127 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use GenderDetector\Exception\FileReadingException;
+use GenderDetector\GenderDetector;
+use GenderDetector\Country;
+
+set_error_handler(static fn (int $_, string $message): never => throw new ErrorException($message));
+require_autoload();
+main($argv);
+
+function require_autoload(): void
+{
+    foreach ([
+        __DIR__ . '/../vendor/autoload.php',
+        __DIR__ . '/../../../autoload.php'
+    ] as $path) {
+        if (file_exists($path)) {
+            require $path;
+            return;
+        }
+    }
+
+    print_error_and_exit('install dependencies using Composer.');
+}
+
+function print_error_and_exit(string $message): never
+{
+    fwrite(STDERR, 'Error: ' . $message . "\n");
+    print_help();
+
+    exit(1);
+}
+
+/**
+ * @param array<int, string> $args
+ * @return array{list<string>, Country|null}
+ */
+function parse_args(array $args): array
+{
+    if (count($args) <= 1) {
+        print_error_and_exit('expected at least 1 argument');
+    }
+
+    $names = [];
+    $country = null;
+
+    unset($args[0]);
+
+    foreach ($args as $arg) {
+        switch (true) {
+            case str_starts_with($arg, '--country'):
+                $country = parse_option($arg);
+                $country = Country::tryFrom($country);
+                if ($country === null) {
+                    print_error_and_exit(sprintf('unrecognised country "%s"', $country));
+                }
+                break;
+            case str_starts_with($arg, '--help'):
+                print_help();
+                exit(0);
+            case str_starts_with($arg, '--'):
+                print_error_and_exit(sprintf('unrecognised option "%s"', $arg));
+            default:
+                $names[] = $arg;
+        }
+    }
+
+    return [$names, $country];
+}
+
+function parse_option(string $option): string
+{
+    try {
+        [ , $value] = explode('=', $option);
+    } catch (Throwable) {
+        print_error_and_exit(sprintf('could not parse option "%s". See "--help"', $option));
+    }
+
+    return $value;
+}
+
+function print_help(): void
+{
+    fwrite(STDOUT, <<<HELP
+    Usage: 
+        get-gender name1 [name2 ...] [--country=country_name]
+    
+    Example: 
+        get-gender jane
+        get-gender elon steven --country=usa
+        get-gender martin --country=france
+    HELP . "\n");
+}
+
+/**
+ * @param array<int, string> $argv
+ */
+function main(array $argv): never
+{
+    try {
+        $detector = new GenderDetector();
+    } catch (FileReadingException $e) {
+        print_error_and_exit($e->getMessage());
+    }
+
+    [$names, $country] = parse_args($argv);
+
+    if (empty($names)) {
+        print_error_and_exit('expected at least 1 name');
+    }
+
+    $genders = [];
+    foreach ($names as $name) {
+        try {
+            $genders[] = $detector->getGender($name, $country)?->name ?? 'unknown';
+        } catch (Throwable $t) {
+            print_error_and_exit($t->getMessage());
+        }
+    }
+
+    fwrite(STDOUT, implode(' ', $genders) . "\n");
+
+    exit(0);
+}

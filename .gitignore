@@ -1,5 +1,5 @@
 composer.lock
-vendor
-.idea/
-/.php_cs.cache
+/vendor
+/.php-cs-fixer.cache
 /.phpunit.result.cache
+/.phpunit.cache
