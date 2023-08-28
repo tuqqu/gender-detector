@@ -53,10 +53,7 @@ function parse_args(array $args): array
         switch (true) {
             case str_starts_with($arg, '--country'):
                 $country = parse_option($arg);
-                $country = Country::tryFrom($country);
-                if ($country === null) {
-                    print_error_and_exit(sprintf('unrecognised country "%s"', $country));
-                }
+                $country = Country::fromISO3166($country);
                 break;
             case str_starts_with($arg, '--help'):
                 print_help();

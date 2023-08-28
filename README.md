@@ -26,37 +26,33 @@ $detector->getGender('Avery');
 // Gender::Unisex
 ```
 
-Internationalization (I18N) is fully supported:
+I18N is fully supported:
 
 ```php
-$detector->getGender('Želmíra');
-// Gender::Female
-
 $detector->getGender('Geirþrúður');
 // Gender::Female
 ```
 
-You can also specify a country or region:
+You can also specify a country:
 
 ```php
-use GenderDetector\Country;
-
 $detector->getGender('Robin');
 // Gender::MostlyMale
 
-$detector->getGender('Robin', Country::Usa);
+$detector->getGender('Robin', 'US');
 // Gender::MostlyFemale
 
-$detector->getGender('Robin', Country::France);
+$detector->getGender('Robin', 'FR');
 // Gender::Male
 
-$detector->getGender('Robin', Country::Ireland);
+$detector->getGender('Robin', 'IE');
 // Gender::Unisex
 ```
 
-For more details about countries see [country list](/doc/country_list.md).
+Country codes are case-insensitive ISO 3166-1 alpha-2 codes.
+Alternatively, you can utilize enum values; the complete list of values and codes can be found [here](/src/Country.php).
 
-Full list of all the possible values are:
+Full list of all the possible gender values are:
 
 ```php
 enum Gender

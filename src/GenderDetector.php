@@ -11,6 +11,7 @@ use function count;
 use function hexdec;
 use function mb_strtolower;
 use function str_replace;
+use function is_string;
 
 final class GenderDetector
 {
@@ -29,8 +30,12 @@ final class GenderDetector
         $this->consumeDictFile($dictPath);
     }
 
-    public function getGender(string $name, ?Country $country = null): ?Gender
+    public function getGender(string $name, string|Country|null $country = null): ?Gender
     {
+        if (is_string($country)) {
+            $country = Country::fromISO3166($country);
+        }
+
         $name = self::sanitizeName($name);
 
         if (!isset($this->names[$name])) {

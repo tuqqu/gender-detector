@@ -4,67 +4,144 @@ declare(strict_types=1);
 
 namespace GenderDetector;
 
-enum Country: string
+use function mb_strtoupper;
+
+enum Country
 {
-    case GreatBritain = 'great_britain';
-    case Ireland = 'ireland';
-    case Usa = 'usa';
-    case Italy = 'italy';
-    case Malta = 'malta';
-    case Portugal = 'portugal';
-    case Spain = 'spain';
-    case France = 'france';
-    case Belgium = 'belgium';
-    case Luxembourg = 'luxembourg';
-    case TheNetherlands = 'the_netherlands';
-    case EastFrisia = 'east_frisia';
-    case Germany = 'germany';
-    case Austria = 'austria';
-    case Swiss = 'swiss';
-    case Iceland = 'iceland';
-    case Denmark = 'denmark';
-    case Norway = 'norway';
-    case Sweden = 'sweden';
-    case Finland = 'finland';
-    case Estonia = 'estonia';
-    case Latvia = 'latvia';
-    case Lithuania = 'lithuania';
-    case Poland = 'poland';
-    case CzechRepublic = 'czech_republic';
-    case Slovakia = 'slovakia';
-    case Hungary = 'hungary';
-    case Romania = 'romania';
-    case Bulgaria = 'bulgaria';
-    case BosniaAndHerzegovina = 'bosnia_and_herzegovina';
-    case Croatia = 'croatia';
-    case Kosovo = 'kosovo';
-    case NorthMacedonia = 'north_macedonia';
-    case Montenegro = 'montenegro';
-    case Serbia = 'serbia';
-    case Slovenia = 'slovenia';
-    case Albania = 'albania';
-    case Greece = 'greece';
-    case Russia = 'russia';
-    case Belarus = 'belarus';
-    case Moldova = 'moldova';
-    case Ukraine = 'ukraine';
-    case Armenia = 'armenia';
-    case Azerbaijan = 'azerbaijan';
-    case Georgia = 'georgia';
-    case Kazakhstan = 'kazakhstan';
-    case Kyrgyzstan = 'kyrgyzstan';
-    case Tajikistan = 'tajikistan';
-    case Turkmenistan = 'turkmenistan';
-    case Uzbekistan = 'uzbekistan';
-    case Turkey = 'turkey';
-    case Arabia = 'arabia';
-    case Iran = 'iran';
-    case Israel = 'israel';
-    case China = 'china';
-    case India = 'india';
-    case SriLanka = 'sri_lanka';
-    case Japan = 'japan';
-    case Korea = 'korea';
-    case Vietnam = 'vietnam';
-    case OtherCountries = 'other_countries';
+    case GreatBritain;
+    case Ireland;
+    case Usa;
+    case Italy;
+    case Malta;
+    case Portugal;
+    case Spain;
+    case France;
+    case Belgium;
+    case Luxembourg;
+    case TheNetherlands;
+    case EastFrisia;
+    case Germany;
+    case Austria;
+    case Swiss;
+    case Iceland;
+    case Denmark;
+    case Norway;
+    case Sweden;
+    case Finland;
+    case Estonia;
+    case Latvia;
+    case Lithuania;
+    case Poland;
+    case CzechRepublic;
+    case Slovakia;
+    case Hungary;
+    case Romania;
+    case Bulgaria;
+    case BosniaAndHerzegovina;
+    case Croatia;
+    case Kosovo;
+    case NorthMacedonia;
+    case Montenegro;
+    case Serbia;
+    case Slovenia;
+    case Albania;
+    case Greece;
+    case Russia;
+    case Belarus;
+    case Moldova;
+    case Ukraine;
+    case Armenia;
+    case Azerbaijan;
+    case Georgia;
+    case Kazakhstan;
+    case Kyrgyzstan;
+    case Tajikistan;
+    case Turkmenistan;
+    case Uzbekistan;
+    case Turkey;
+    case Arabia;
+    case Iran;
+    case Israel;
+    case China;
+    case India;
+    case SriLanka;
+    case Japan;
+    case Korea;
+    case Vietnam;
+    case OtherCountries;
+
+    public static function fromISO3166(string $iso3166): self
+    {
+        return match (mb_strtoupper($iso3166)) {
+            'GB' => self::GreatBritain,
+            'IE' => self::Ireland,
+            'AU',
+            'CA',
+            'US' => self::Usa,
+            'IT' => self::Italy,
+            'MT' => self::Malta,
+            'PT' => self::Portugal,
+            'ES' => self::Spain,
+            'FR' => self::France,
+            'BE' => self::Belgium,
+            'LU' => self::Luxembourg,
+            'NL' => self::TheNetherlands,
+            'DE' => self::Germany,
+            'AT' => self::Austria,
+            'CH' => self::Swiss,
+            'IS' => self::Iceland,
+            'DK' => self::Denmark,
+            'NO' => self::Norway,
+            'SE' => self::Sweden,
+            'FI' => self::Finland,
+            'EE' => self::Estonia,
+            'LV' => self::Latvia,
+            'LT' => self::Lithuania,
+            'PL' => self::Poland,
+            'CZ' => self::CzechRepublic,
+            'SK' => self::Slovakia,
+            'HU' => self::Hungary,
+            'RO' => self::Romania,
+            'BG' => self::Bulgaria,
+            'BA' => self::BosniaAndHerzegovina,
+            'HR' => self::Croatia,
+            'XK' => self::Kosovo,
+            'MK' => self::NorthMacedonia,
+            'ME' => self::Montenegro,
+            'RS' => self::Serbia,
+            'SI' => self::Slovenia,
+            'AL' => self::Albania,
+            'GR' => self::Greece,
+            'RU' => self::Russia,
+            'BY' => self::Belarus,
+            'MD' => self::Moldova,
+            'UA' => self::Ukraine,
+            'AM' => self::Armenia,
+            'AZ' => self::Azerbaijan,
+            'GE' => self::Georgia,
+            'KZ' => self::Kazakhstan,
+            'KG' => self::Kyrgyzstan,
+            'TJ' => self::Tajikistan,
+            'TM' => self::Turkmenistan,
+            'UZ' => self::Uzbekistan,
+            'TR' => self::Turkey,
+            'AE',
+            'QA',
+            'SA',
+            'BH',
+            'EG' => self::Arabia,
+            'CN',
+            'HK',
+            'TW' => self::China,
+            'IN' => self::India,
+            'JP' => self::Japan,
+            'KP',
+            'KR' => self::Korea,
+            'VN' => self::Vietnam,
+            'LK' => self::SriLanka,
+            'IR' => self::Iran,
+            'IL' => self::Israel,
+            default => self::OtherCountries,
+        };
+    }
 }

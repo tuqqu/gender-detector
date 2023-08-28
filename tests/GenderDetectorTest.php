@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 final class GenderDetectorTest extends TestCase
 {
     #[DataProvider('provideNameData')]
-    public function testGetGender(string $name, ?Country $region, Gender $expectedGender): void
+    public function testGetGender(string $name, string|Country|null $region, Gender $expectedGender): void
     {
         $detector = new GenderDetector();
         $gender = $detector->getGender($name, $region);
@@ -76,6 +76,21 @@ final class GenderDetectorTest extends TestCase
             [
                 'Robin',
                 Country::Ireland,
+                Gender::Unisex,
+            ],
+            [
+                'Robin',
+                'US',
+                Gender::MostlyFemale,
+            ],
+            [
+                'Robin',
+                'fr',
+                Gender::Male,
+            ],
+            [
+                'Robin',
+                'IE',
                 Gender::Unisex,
             ],
             [
